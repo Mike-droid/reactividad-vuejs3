@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platzi Commerce</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h3>Platzi Commerce</h3>
+      <button
+        class="cart"
+        @click="cartOpen = !cartOpen"
+      >
+        Carro (0)
+      </button>
+      <div class="cart-content"  v-show="cartOpen">
+        <div
+          class="cart-content__product"
+          v-for="(product, index) in cart"
+          :key="product.name"
+          :class="{ 'bg-gray': index & 1 }"
+        >
+          <img
+            :src="product.images[index].image"
+            :alt="product.name"
+          >
+          <span>
+            {{ product.name }} - ${{ new Intl.NumberFormat("es-MX").format(product.price) }}
+          </span>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section class="product">
+        <div class="product__thumbnails">
+          <div
+            v-for="(image, index) in product.images"
+            :key="image.thumbnail"
+            class="thumb"
+            :class="{ active: activeImage === index }"
+            :style="{ backgroundImage: `url(${product.images[index].thumbnail})` }"
+            @click="activeImage = index"
+          >
+          </div>
+        </div>
+        <div class="product__image">
+          <img
+            :src="product.images[activeImage].image"
+            alt="product.name"
+          />
+        </div>
+      </section>
+      <section class="description">
+        <h4>{{ product.name.toUpperCase() }} {{ product.stock === 0 ? '😭' : '😎' }}</h4>
+        <span
+          class="badge new"
+          v-if="product.new"
+        >
+          Nuevo
+        </span>
+        <span
+          class="badge offer"
+          v-if="product.offer"
+        >
+          Oferta
+        </span>
+        <p
+          class="description__status"
+          v-if="product.stock <= 10 && product.stock > 1"
+        >
+          ¡Quedan pocas unidades!
+        </p>
+        <p
+          class="description__status"
+          v-if="product.stock === 1"
+        >
+          ¡Queda una unidad!
+        </p>
+        <p
+          class="description__status"
+          v-else-if="product.stock === 0"
+        >
+          ¡El producto está agotado!
+        </p>
+        <p
+          class="description__status"
+          v-else>Quedan {{ product.stock }} unidades disponibles
+        </p>
+        <p
+          class="description__price">
+          {{ product.name }} - $ {{ new Intl.NumberFormat("es-MX").format(product.price) }}
+        </p>
+        <p class="description__content">
+          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!
+          Quibusdam quasi, fuga distinctio, qui autem nihil sunt temporibus rerum soluta sit recusandae ipsa ea, possimus repudiandae aperiam! Quidem qui, voluptatem cupiditate dicta a impedit doloribus aperiam voluptas dolore temporibus?
+          Ex architecto deserunt eveniet, a quia libero deleniti? Corporis ipsum cum explicabo exercitationem nesciunt optio a illum sapiente? Excepturi soluta obcaecati quaerat debitis quis odio nemo veritatis repellat similique voluptatibus.
+        </p>
+        <div class="discount">
+          <span>Código de descuento: </span>
+          <input
+            type="text"
+            placeholder="Ingresa tu código"
+            @keyup.enter="product.price *= 50 / 100"
+          >
+        </div>
+        <button
+          :disabled="product.stock === 0"
+          @click="product.stock -= 1"
+        >
+          Agregar al carrito
+        </button>
+      </section>
+    </main>
+  </div>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script>
+    const { createApp } = Vue;
+    const app = createApp({
+      data() {
+        return {
+          product: {
+            name: 'Camara',
+            price: 1000,
+            stock: 11,
+            content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!',
+            images: [
+              {
+                image: "./images/camara.jpg",
+                thumbnail: "./images/camara-thumb.jpg",
+              },
+              {
+                image: "./images/camara-2.jpg",
+                thumbnail: "./images/camara-2-thumb.jpg",
+              }
+            ],
+            new: true,
+            offer: false,
+          },
+          activeImage: 0,
+          cartOpen: true,
+            cart: [
+            {
+              name: 'Camara 2',
+              price: 200,
+              stock: 5,
+              content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!',
+              images: [
+                {
+                  image: "./images/camara.jpg",
+                  thumbnail: "./images/camara-thumb.jpg",
+                },
+                {
+                  image: "./images/camara-2.jpg",
+                  thumbnail: "./images/camara-2-thumb.jpg",
+                }
+              ],
+              new: true,
+              offer: false,
+            },
+            {
+            name: 'Camara 3',
+            price: 3000,
+            stock: 10,
+            content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!',
+            images: [
+              {
+                image: "./images/camara.jpg",
+                thumbnail: "./images/camara-thumb.jpg",
+              },
+              {
+                image: "./images/camara-2.jpg",
+                thumbnail: "./images/camara-2-thumb.jpg",
+              }
+            ],
+            new: true,
+            offer: false,
+          },
+          ]
+        }
+      },
+    });
+    app.mount("#app");
+  </script>
+</body>
+</html>
