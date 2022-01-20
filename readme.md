@@ -428,3 +428,177 @@ var Platzi = {
 ### List rendering
 
 ### Template
+
+## APIs internas de Vue.js
+
+### Options API vs Composition API
+
+| Options API                                                        | Composition API                                                               |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| Objeto de opciones para configurar nuestra aplicación o componente | Funcionalidad interna para componer y organizar por características(features) |
+
+Una *ventaja* del options API es que es muy fácil para iniciar y crear cosas simples.
+
+Composition API es mejor para proyectos grandes y escalables.
+
+### data() y ref()
+
+ref nos permite crear nueva información reactiva en nuestro proyecto.
+
+```javascript
+const { createApp, ref } = Vue;
+    const app = createApp({
+      setup(){
+        const product = ref({
+          name: 'Camara',
+          price: 1000,
+          stock: 11,
+          content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!',
+          images: [
+            {
+              image: "./images/camara.jpg",
+              thumbnail: "./images/camara-thumb.jpg",
+            },
+            {
+              image: "./images/camara-2.jpg",
+              thumbnail: "./images/camara-2-thumb.jpg",
+            }
+          ],
+          new: true,
+          offer: false,
+        });
+
+        const activeImage = ref(0);
+
+        const cartOpen = ref(false);
+
+        const cart = ref([]);
+
+        setTimeout(() => {
+          activeImage.value = 1;
+        }, 2000);
+
+        return {
+          product,
+          activeImage,
+          cartOpen,
+          cart,
+        };
+      },
+    });
+    app.mount("#app");
+```
+
+### Métodos personalizados con Options API
+
+```javascript
+methods: {
+  applyDiscount(event) {
+    const discountCodeIndex = this.discountCodes.indexOf(event.target.value);
+    if(discountCodeIndex >= 0) {
+      this.product.price *= 50 / 100
+      this.discountCodes.splice(discountCodeIndex, 1);
+    }
+  },
+
+  addToCart() {
+    const productIndex = this.cart.findIndex(product => product.name === this.product.name);
+    if(productIndex >= 0) {
+      this.cart[productIndex].quantity += 1;
+    } else {
+      this.cart.push(this.product);
+    }
+    this.product.stock -= 1;
+  }
+}
+```
+
+### Métodos personalizados con Composition API
+
+```javascript
+const cart = ref([]);
+function addToCart() {
+  const productIndex = cart.value.findIndex(product => product.name === product.value.name);
+  if(productIndex >= 0) {
+    cart.value[productIndex].quantity += 1;
+  } else {
+    cart.value.push(product.value);
+  }
+  product.value.stock -= 1;
+}
+
+const discountCodes = ref(['Platzi20', 'Mike']);
+function applyDiscount(event) {
+  const discountCodeIndex = discountCodes.value.indexOf(event.target.value);
+  if(discountCodeIndex >= 0) {
+    product.value.price *= 50 / 100
+    discountCodes.value.splice(discountCodeIndex, 1);
+    //! Importante usar value para que se refleje en el DOM
+  }
+}
+```
+
+### reactive()
+
+```javascript
+const { createApp, ref, reactive, toRefs } = Vue;
+  const app = createApp({
+    setup(){
+      const productState = reactive({
+        product: {
+          name: 'Camara',
+          price: 1000,
+          stock: 11,
+          content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio vero labore deserunt, incidunt eos, sunt eveniet quidem tempora iste debitis consectetur perferendis ratione velit asperiores mollitia corrupti harum. Error, ab!',
+          images: [
+            {
+              image: "./images/camara.jpg",
+              thumbnail: "./images/camara-thumb.jpg",
+            },
+            {
+              image: "./images/camara-2.jpg",
+              thumbnail: "./images/camara-2-thumb.jpg",
+            }
+          ],
+          new: true,
+          offer: false,
+          quantity: 1,
+        },
+        activeImage: 0
+      });
+
+      const cartState = reactive({
+        cartOpen: false,
+        cart: [],
+      });
+
+      function addToCart() {
+        const productIndex = cartState.cart.findIndex(product => product.name === productState.product.name);
+        if(productIndex >= 0) {
+          cartState.cart[productIndex].quantity += 1;
+        } else {
+          cartState.cart.push(productState.product);
+        }
+        productState.product.stock -= 1;
+      }
+
+      const discountCodes = ref(['Platzi20', 'Mike']);
+      function applyDiscount(event) {
+        const discountCodeIndex = discountCodes.value.indexOf(event.target.value);
+        if(discountCodeIndex >= 0) {
+          productState.product.price *= 50 / 100
+          discountCodes.value.splice(discountCodeIndex, 1);
+          //! Importante usar value para que se refleje en el DOM
+        }
+      }
+
+      return {
+        ...toRefs(productState),
+        ...toRefs(cartState),
+        addToCart,
+        applyDiscount,
+      };
+    },
+  });
+app.mount("#app");
+```
