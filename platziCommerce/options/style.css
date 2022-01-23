@@ -136,3 +136,9 @@ main .description button:hover {
 .badge.offer {
   background-color: rgb(197, 107, 33);
 }
+
+#searchInput {
+  width: 200px;
+  height: 100px;
+  background-color: aliceblue;
+}
